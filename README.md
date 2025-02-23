@@ -6,7 +6,7 @@ What is life? It's too profound. Let's break it down with calculus. Life can be 
 <!-- how to write f like d? -->
 
 $$
-\text{life} = \int i \cdot \text{f}e
+\text{life} \approx \int i \cdot \text{f}e
 $$
 
 What is "ife"? I think time is the most crucial part. As for "i", that's up to our imagination:
@@ -15,7 +15,7 @@ $$
 \text{lidt} = \int i \text{d}t 
 $$
 
-How does it come to life? People always make the best choices:
+How does it come to life? Reality always chooses the best way:
 
 $$
 \text{milidt} = \min \int i \text{d}t
@@ -44,4 +44,9 @@ systemProp.https.proxyPort=7890
 
 ## timeline
 
+- 2025-02-23 16:35:55= :sparkles: file explorer [more](docs/dev/file-explorer.md)
+- 2025-02-23 15:46:40= use "getx" as base framework [more](docs/dev/framework.md)
 - 2025-02-23 15:40:07= run template
+
+
+:sparkles: : feature request
