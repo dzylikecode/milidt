@@ -1,5 +1,14 @@
 # milidt /ˈmɪlaɪt/
 
+What is life? It's too profound. Let's break it down with calculus. Life can be seen as a series of integrals:
+
+<!-- e is kind of like t -->
+<!-- how to write f like d? -->
+
+$$
+\text{life} = \int i \cdot \text{f}e
+$$
+
 What is "ife"? I think time is the most crucial part. As for "i", that's up to our imagination:
 
 $$
