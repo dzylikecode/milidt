@@ -1,16 +1,38 @@
-# milidt
+# milidt /ˈmɪlaɪt/
 
-A new Flutter project.
+What is "ife"? I think time is the most crucial part. As for "i", that's up to our imagination:
 
-## Getting Started
+$$
+\text{lidt} = \int i \text{d}t 
+$$
 
-This project is a starting point for a Flutter application.
+How does it come to life? People always make the best choices:
 
-A few resources to get you started if this is your first Flutter project:
+$$
+\text{milidt} = \min \int i \text{d}t
+$$
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+:stuck_out_tongue_winking_eye:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## development
+
+build anroid apk：
+
+```bash
+flutter build apk
+```
+
+### [env] android proxy
+
+[Gradle proxy configuration](https://stackoverflow.com/questions/5991194/gradle-proxy-configuration), add the following to `gradle.properties`:
+
+```properties
+systemProp.http.proxyHost=127.0.0.1
+systemProp.http.proxyPort=7890
+systemProp.https.proxyHost=127.0.0.1
+systemProp.https.proxyPort=7890
+```
+
+## timeline
+
+- 2025-02-23 15:40:07= run template
