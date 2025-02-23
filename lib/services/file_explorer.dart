@@ -8,8 +8,16 @@ import 'package:path/path.dart';
 class FileExplorerService extends GetxService {
   static FileExplorerService get to => Get.find();
 
-  final rootDir = "".obs;
+  FileExplorerService({
+    String initialRootDir = "",
+    this.onRootDirChanged
+  }): 
+  rootDir = initialRootDir.obs;
+
+  RxString rootDir;
   String get rootDirName => basename(rootDir.value);
+
+  void Function(String)? onRootDirChanged;
 
   void pickDir() async {
     await requestStoragePermission();
@@ -21,6 +29,7 @@ class FileExplorerService extends GetxService {
   void setRootDir(String newRootDir) {
     if (rootDir.value == newRootDir) return;
     rootDir.value = newRootDir;
+    onRootDirChanged?.call(newRootDir);
   }
 }
 

@@ -25,3 +25,9 @@ android 需要在`android/app/src/main/AndroidManifest.xml`添加：
     ...
 </manifest>
 ```
+
+## ndkversion
+
+因为permission handler，设置了ndk的version
+
+## shared_preferences store app state
