@@ -49,10 +49,34 @@ class FileExplorer extends StatelessWidget {
                         );
 
   Widget get explorerSpace => Expanded(
-                                child: Obx(() => fileTree),
+                                child: Obx(() => 
+                                  controller.isLoading.value
+                                  ? loading
+                                  : fileTree
+                                ),
                               );
   
-  Widget get footer => SizedBox();
+  Widget get footer =>  Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            createFolder,
+                            createFile,
+                          ],
+                        );
+  
+  Widget get createFolder => IconButton(
+                              icon: const Icon(Icons.create_new_folder),
+                              onPressed: controller.createFolderPrompt,
+                            );
+  
+  Widget get createFile =>  IconButton(
+                              icon: const Icon(Icons.note_add),
+                              onPressed: controller.createFilePrompt,
+                            );
+
+  Widget get loading => Center(
+                          child: CircularProgressIndicator(),
+                        );
 
   Widget get fileTree 
   =>  TreeView.simpleTyped<FileSystemEntity, ExplorableNode>(

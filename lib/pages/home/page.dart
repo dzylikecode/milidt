@@ -27,9 +27,9 @@ class HomePage extends GetView<HomePageController> {
                               ),
                             );
   
-  Widget get projectNotOpened => Scaffold(
-                                body: openProject,
-                              );
+  Widget get projectNotOpened =>  Scaffold(
+                                    body: openProject,
+                                  );
 
 
   Widget get projectOpened => Scaffold(
