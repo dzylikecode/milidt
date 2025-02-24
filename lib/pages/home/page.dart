@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
+
+import '../../widgets/file_explorer.dart';
 import '../../services/file_explorer.dart';
 
 part 'controller.dart';
@@ -34,6 +36,10 @@ class HomePage extends GetView<HomePageController> {
                                 appBar: AppBar(
                                   title: Text(controller.projectName),
                                 ),
-                                drawer: Drawer(),
+                                drawer: Drawer(
+                                  child: FileExplorer(
+                                    key: ValueKey(controller.projectPath),
+                                  ),
+                                ),
                               );
 }

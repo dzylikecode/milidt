@@ -44,6 +44,7 @@ systemProp.https.proxyPort=7890
 
 ## timeline
 
+- 2025-02-24 15:05:14= file explorer implemented
 - 2025-02-23 16:35:55= :sparkles: file explorer [more](docs/dev/file-explorer.md)
 - 2025-02-23 15:46:40= use "getx" as base framework [more](docs/dev/framework.md)
 - 2025-02-23 15:40:07= run template

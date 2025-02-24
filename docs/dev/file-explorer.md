@@ -31,3 +31,8 @@ android 需要在`android/app/src/main/AndroidManifest.xml`添加：
 因为permission handler，设置了ndk的version
 
 ## shared_preferences store app state
+
+
+## tree
+
+[animated_tree_view](https://pub.dev/packages/animated_tree_view) 好看，但是drawer收回的时候，它就不会展开了，后面需要自己改

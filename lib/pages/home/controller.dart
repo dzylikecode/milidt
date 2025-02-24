@@ -7,4 +7,6 @@ class HomePageController extends GetxController {
   bool get projectOpened => FileExplorerService.to.rootDir.value.isNotEmpty;
 
   String get projectName => FileExplorerService.to.rootDirName;
+
+  String get projectPath => FileExplorerService.to.rootDir.value;
 }
