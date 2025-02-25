@@ -1,4 +1,5 @@
 import 'home/page.dart';
+import 'text_file_editor/page.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,6 +11,11 @@ enum Pages {
     page: HomePage.new,
     binding: HomePageBinding.new,
   ),
+  textFileEditor(
+    name: '/textFileEditor',
+    page: TextFileEditorPage.new,
+    binding: TextFileEditorPageBinding.new,
+  )
   ;
   final String name;
   final Widget Function() page;

@@ -1,9 +1,13 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-
+import 'dart:io';
+import 'package:path/path.dart';
 
 import '../../widgets/file_explorer.dart';
 import '../../services/file_explorer.dart';
+import '../../widgets/file_preview.dart';
+import '../pages.dart';
+import '../text_file_editor/page.dart';
 
 part 'controller.dart';
 part 'binding.dart';
@@ -34,12 +38,27 @@ class HomePage extends GetView<HomePageController> {
 
   Widget get projectOpened => Scaffold(
                                 appBar: AppBar(
-                                  title: Text(controller.projectName),
+                                  title: Obx(() => 
+                                    controller.fileOpened
+                                    ? Text(controller.fileName)
+                                    : Text(controller.projectName)
+                                  ),
                                 ),
                                 drawer: Drawer(
                                   child: FileExplorer(
                                     key: ValueKey(controller.projectPath),
                                   ),
                                 ),
+                                body: controller.fileOpened
+                                    ? filePreivew
+                                    : null,
                               );
+
+  Widget get filePreivew => Obx(() => FilePreivew(
+                              key: ValueKey(controller.openedFile.path),
+                              file: controller.openedFile, 
+                              type: controller.fileType,
+                              content: controller.fileContent,
+                              onDoubleTap: controller.doubleTapFilePreview,
+                            ));
 }

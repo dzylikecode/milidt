@@ -71,8 +71,9 @@ class FileExplorerService extends GetxService {
     if (node == selected.value) return;
     selected.value = node;
     if (node.entity is File) {
+      activeFile.value = node.entity as File;
       Get.back();
-      goToPreviewFile(node.entity as File);
+      goToPreviewFile(activeFile.value!);
     }
   }
 
@@ -143,12 +144,6 @@ class FileExplorerService extends GetxService {
     }
     return null;
   }
-
-
-  void goToPreviewFile(File file) {
-
-  }
-
   void onLongPressExplorable(ExplorableNode node) {
   }
 
@@ -171,6 +166,22 @@ class FileExplorerService extends GetxService {
     editController.dispose();
     super.onClose();
   }
+
+  final activeFile = Rx<File?>(null);
+  final fileContent = "".obs;
+  var fileType = FilePreviewType.unknown;
+  void goToPreviewFile(File file) {
+    // TODO: 采用异步加载文件内容
+    final (type, content) = recognizedByExt(file) 
+                            ?? recognizedByContent(file);
+    fileType = type;
+    fileContent.value = content;
+  }
+
+
+
+
+
 }
 
 Future<bool> requestStoragePermission() async {
@@ -274,4 +285,31 @@ String getFirstSubPath(String contextDir, String createdPath) {
   final relativePath = relative(createdPath, from: contextDir);
   final parts = split(relativePath);
   return join(contextDir, parts.first);
+}
+
+enum FilePreviewType {
+  image,
+  text,
+  markdown,
+  unknown,
+}
+
+(FilePreviewType, String)? recognizedByExt(File file) {
+  final ext = file.path.split('.').last;
+
+  final imageExt = ['jpg', 'jpeg', 'png', 'gif'];
+  if (imageExt.contains(ext)) return (FilePreviewType.image, "");
+
+  final markdownExt = ['md', ];
+  if (markdownExt.contains(ext)) return (FilePreviewType.markdown, file.readAsStringSync());
+
+  return null;
+}
+
+(FilePreviewType, String) recognizedByContent(File file) {
+  final content = file.readAsStringSync();
+  if (content.isEmpty && file.lengthSync() > 0) {
+    return (FilePreviewType.unknown, "");
+  }
+  return (FilePreviewType.text, content);
 }
