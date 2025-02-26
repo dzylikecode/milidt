@@ -43,6 +43,26 @@ symbols:
 - :page_facing_up: code style
 - :bulb: idea
 
+### 2025-02-26 10:56:45
+
+:bug: [Typed return values for named routes](https://github.com/jonataslaw/getx/issues/734): if using the getx 5.0.0, then the `Get.back()` will not work, the solution is that in the version 4.7.2, it can't deal with the nullable return value, I just wrap it in a class.
+
+```dart
+final String? result = await Get.toNamed('/somePage');
+```
+
+```dart
+final Ret result = await Get.toNamed('/somePage');
+if (result.content != null) {
+  // do something
+}
+```
+
+
+### 2025-02-25 17:12:38
+
+:sparkles: [undo/redo](https://api.flutter.dev/flutter/widgets/UndoHistoryController-class.html) toolbar which is [attached to the keyboard](https://pub.dev/packages/keyboard_attachable)
+
 ### 2025-02-25 14:41:34
 
 :sparkles: image preview

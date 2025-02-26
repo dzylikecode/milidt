@@ -177,11 +177,6 @@ class FileExplorerService extends GetxService {
     fileType = type;
     fileContent.value = content;
   }
-
-
-
-
-
 }
 
 Future<bool> requestStoragePermission() async {
