@@ -42,10 +42,11 @@ symbols:
 - :rocket: action 
 - :page_facing_up: code style
 - :bulb: idea
+- :hammer: fix
 
 ### 2025-02-26 10:56:45
 
-:bug: [Typed return values for named routes](https://github.com/jonataslaw/getx/issues/734): if using the getx 5.0.0, then the `Get.back()` will not work, the solution is that in the version 4.7.2, it can't deal with the nullable return value, I just wrap it in a class.
+:hammer: [Typed return values for named routes](https://github.com/jonataslaw/getx/issues/734): if using the getx 5.0.0, then the `Get.back()` will not work; in the version 4.7.2, it can't deal with the nullable return value. So I just wrap it in a class.
 
 ```dart
 final String? result = await Get.toNamed('/somePage');
