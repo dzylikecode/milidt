@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-
 import '../services/file_explorer.dart';
+import 'file_preview/markdown/markdown.dart';
 
 class FilePreivew extends StatelessWidget {
   final File file;
@@ -22,7 +22,7 @@ class FilePreivew extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onDoubleTap: onDoubleTap,
-        child: preview,
+        child: SafeArea(child: preview),
     );
   }
 
@@ -30,7 +30,7 @@ class FilePreivew extends StatelessWidget {
   => switch(type) {
     FilePreviewType.image => image,
     FilePreviewType.text => textFilePreview,
-    FilePreviewType.markdown => Text(content),
+    FilePreviewType.markdown => markdown,
     FilePreviewType.unknown => unknownedBinaryFile,
   };
 
@@ -69,7 +69,33 @@ class FilePreivew extends StatelessWidget {
       ],
     );
   
+  Widget get markdown 
+  => TextFilePreviewContainer(
+    child: content.isEmpty
+        ? textEmptyPrompt
+        : MarkdownPreview(content: content),
+  );
 
 }
 
+class TextFilePreviewContainer  extends StatelessWidget {
+  final Widget child;
+  const TextFilePreviewContainer({super.key, required this.child});
 
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: SizedBox(
+              width: double.infinity,
+              child: child,
+            )
+          ),
+        )
+      ],
+    );
+  }
+}

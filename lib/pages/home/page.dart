@@ -54,11 +54,15 @@ class HomePage extends GetView<HomePageController> {
                                     : null,
                               );
 
-  Widget get filePreivew => Obx(() => FilePreivew(
-                              key: ValueKey(controller.openedFile.path),
-                              file: controller.openedFile, 
-                              type: controller.fileType,
-                              content: controller.fileContent,
-                              onDoubleTap: controller.doubleTapFilePreview,
-                            ));
+  Widget get filePreivew => Obx(() => 
+                              controller.fileLoading 
+                              ? const Center(child: CircularProgressIndicator(),)
+                              : FilePreivew(
+                                  key: ValueKey(controller.openedFile.path),
+                                  file: controller.openedFile, 
+                                  type: controller.fileType,
+                                  content: controller.fileContent,
+                                  onDoubleTap: controller.doubleTapFilePreview,
+                                )
+                            );
 }

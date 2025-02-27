@@ -17,9 +17,12 @@ class HomePageController extends GetxController {
 
   FilePreviewType get fileType => FileExplorerService.to.fileType;
   String get fileContent => FileExplorerService.to.fileContent.value;
+  bool get fileLoading => FileExplorerService.to.fileLoading.value;
 
   void doubleTapFilePreview() async {
-    if (fileType == FilePreviewType.text) {
+    if (fileType == FilePreviewType.text
+    || fileType == FilePreviewType.markdown
+    ) {
       final arguments = TextFileEditorPageArgs(file: openedFile, content: fileContent);
       // https://github.com/jonataslaw/getx/issues/734
       final TextFileEditorPageRet ret = await Get.toNamed(Pages.textFileEditor.name, arguments: arguments);

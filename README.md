@@ -44,6 +44,33 @@ symbols:
 - :bulb: idea
 - :hammer: fix
 
+### 2025-02-26 21:49:17
+
+:rocket: test markdown mathtex regex:
+
+- inline: 
+  
+  ```txt
+  \$(?:\\\$|[^$]|\n(?!\n))+?\$|\\\((?:[^\\(]|\n(?!\n))+?\\\)
+  ```
+
+- block: 
+
+  ```txt
+  \$\$(?:\\\$|[^$]|\n(?!\n))+\$\$|\\\[(?:[^\\[]|\n(?!\n))+?\\\]
+  ```
+
+virualize: https://regex-vis.com/
+test here: https://regexr.com/
+
+### 2025-02-27 16:14:36
+
+https://github.com/asjqkkkk/markdown_widget/tree/dev
+
+### 2025-02-26 19:23:16
+
+:sparkles: markdown viewer
+
 ### 2025-02-26 10:56:45
 
 :hammer: [Typed return values for named routes](https://github.com/jonataslaw/getx/issues/734): if using the getx 5.0.0, then the `Get.back()` will not work; in the version 4.7.2, it can't deal with the nullable return value. So I just wrap it in a class.

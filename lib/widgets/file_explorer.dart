@@ -128,7 +128,14 @@ class FileExplorer extends StatelessWidget {
             children: [
               const SizedBox(width: 15), 
               nodeIcon(node), 
-              Text(node.name)
+              // 参考 obsidian 的做法，过长就折叠
+              Flexible(
+                child: Text(
+                  node.name,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                ),
+              ),
             ],
           ),
         ),

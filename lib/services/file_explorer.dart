@@ -170,10 +170,12 @@ class FileExplorerService extends GetxService {
   final activeFile = Rx<File?>(null);
   final fileContent = "".obs;
   var fileType = FilePreviewType.unknown;
-  void goToPreviewFile(File file) {
-    // TODO: 采用异步加载文件内容
-    final (type, content) = recognizedByExt(file) 
-                            ?? recognizedByContent(file);
+  final fileLoading = false.obs;
+  void goToPreviewFile(File file) async {
+    fileLoading.value = true;
+    final (type, content) = await recognizedByExt(file) 
+                            ?? await recognizedByContent(file);
+    fileLoading.value = false;
     fileType = type;
     fileContent.value = content;
   }
@@ -289,21 +291,21 @@ enum FilePreviewType {
   unknown,
 }
 
-(FilePreviewType, String)? recognizedByExt(File file) {
+Future<(FilePreviewType, String)?> recognizedByExt(File file) async {
   final ext = file.path.split('.').last;
 
   final imageExt = ['jpg', 'jpeg', 'png', 'gif'];
   if (imageExt.contains(ext)) return (FilePreviewType.image, "");
 
   final markdownExt = ['md', ];
-  if (markdownExt.contains(ext)) return (FilePreviewType.markdown, file.readAsStringSync());
+  if (markdownExt.contains(ext)) return (FilePreviewType.markdown, await file.readAsString());
 
   return null;
 }
 
-(FilePreviewType, String) recognizedByContent(File file) {
-  final content = file.readAsStringSync();
-  if (content.isEmpty && file.lengthSync() > 0) {
+Future<(FilePreviewType, String)> recognizedByContent(File file) async {
+  final content = await file.readAsString();
+  if (content.isEmpty && await file.length() > 0) {
     return (FilePreviewType.unknown, "");
   }
   return (FilePreviewType.text, content);
