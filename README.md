@@ -46,7 +46,10 @@ symbols:
 
 ### 2025-02-27 21:01:43
 
-:sparkles: markdown preview implementation
+:sparkles: markdown preview implementation:
+
+- copy to clipboard: [copybutton](https://github.com/tagnote-app/markdown_viewer/blob/master/lib/src/widgets/copy_button.dart) and [layout](https://github.com/tagnote-app/markdown_viewer/blob/master/lib/src/builders/code_block_builder.dart)
+- highlight code: [highlight](https://github.com/DanXi-Dev/DanXi/blob/main/lib/widget/forum/render/render_impl.dart)
 
 ### 2025-02-27 18:07:03
 
