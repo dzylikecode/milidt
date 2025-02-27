@@ -1,14 +1,15 @@
-import 'package:markdown_viewer/markdown_viewer.dart';
+import 'package:flutter_markdown/flutter_markdown.dart' as render_md;
 import 'package:flutter/material.dart';
-import 'package:flutter_math_fork/flutter_math.dart';
+import 'package:markdown/markdown.dart' as md;
+import 'package:flutter_markdown_latex/flutter_markdown_latex.dart';
 import 'dart:io';
 
 
-import 'package:markdown_viewer/markdown_viewer.dart';
-import 'package:flutter_prism/flutter_prism.dart';
+import 'code_block.dart';
 
 
 part 'katex.dart';
+
 
 class MarkdownPreview extends StatelessWidget {
   final String content;
@@ -20,14 +21,14 @@ class MarkdownPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MarkdownViewer(
-      content,
-      enableTaskList: true,
-      syntaxExtensions: [TexSyntax()],
-      elementBuilders: [
-        TexBuilder(),
-      ],
-      imageBuilder: (uri, info) {
+    return render_md.Markdown(
+      data: content,
+      selectable: true,
+      builders: {
+        'latex': LatexElementBuilderFixed(),
+        HighlightBuilder.tag: HighlightBuilder(),
+      },
+      imageBuilder: (uri, title, alt) {
         try {
           if (uri.scheme == 'http' || uri.scheme == 'https') {
             return Image.network(uri.toString());
@@ -48,12 +49,18 @@ class MarkdownPreview extends StatelessWidget {
           );
         }
       },
-      highlightBuilder: (text, language, infoString) {
-        final prism = Prism(
-          mouseCursor: SystemMouseCursors.text,
-        );
-        return prism.render(text, language ?? 'plain');
-      },
+      extensionSet: md.ExtensionSet(
+        [LatexBlockSyntax(), ...md.ExtensionSet.gitHubWeb.blockSyntaxes],
+        [LatexInlineSyntax(),  md.EmojiSyntax(), ...md.ExtensionSet.gitHubWeb.inlineSyntaxes],
+      ),
+      styleSheet: render_md.MarkdownStyleSheet(
+          p: TextStyle(fontSize: 16),
+          code: TextStyle(backgroundColor: Colors.grey[200]),
+          codeblockDecoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
     );
   }
 }

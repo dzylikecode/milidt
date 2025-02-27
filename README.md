@@ -44,6 +44,18 @@ symbols:
 - :bulb: idea
 - :hammer: fix
 
+### 2025-02-27 21:01:43
+
+:sparkles: markdown preview implementation
+
+### 2025-02-27 18:07:03
+
+:sparkles: [markdown viewer](https://pub.dev/packages/markdown_viewer) is not maintained, so I use the official package and refer to these [code](https://github.com/DanXi-Dev/DanXi/blob/v1.4.7/lib/widget/forum/render/render_impl.dart)
+
+### 2025-02-27 16:14:36
+
+:bulb: https://github.com/asjqkkkk/markdown_widget/tree/dev
+
 ### 2025-02-26 21:49:17
 
 :rocket: test markdown mathtex regex:
@@ -63,13 +75,9 @@ symbols:
 virualize: https://regex-vis.com/
 test here: https://regexr.com/
 
-### 2025-02-27 16:14:36
-
-https://github.com/asjqkkkk/markdown_widget/tree/dev
-
 ### 2025-02-26 19:23:16
 
-:sparkles: markdown viewer
+:sparkles: [markdown viewer](https://pub.dev/packages/markdown_viewer)
 
 ### 2025-02-26 10:56:45
 

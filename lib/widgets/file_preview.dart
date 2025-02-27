@@ -70,11 +70,11 @@ class FilePreivew extends StatelessWidget {
     );
   
   Widget get markdown 
-  => TextFilePreviewContainer(
-    child: content.isEmpty
-        ? textEmptyPrompt
-        : MarkdownPreview(content: content),
-  );
+  => content.isEmpty
+        ? TextFilePreviewContainer(
+          child: textEmptyPrompt,
+          )
+        : MarkdownPreview(content: content);
 
 }
 

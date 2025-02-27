@@ -41,13 +41,9 @@ dependencies:
   path: ^1.9.1
   shared_preferences: ^2.5.2
   keyboard_attachable: ^2.2.0
-  # https://github.com/tagnote-app/markdown_viewer/pull/95
-  markdown_viewer:
-      git:
-        url: https://github.com/ogtushar/markdown_viewer
-        ref: fix-breaking-changes
-  flutter_prism: ^0.2.2
-  flutter_math_fork: ^0.7.3
+  flutter_markdown: ^0.7.6+2
+  flutter_markdown_latex: ^0.3.4
+  flutter_highlighting: ^0.9.0+11.8.0
 
 
 dependency_overrides:
