@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:path/path.dart';
+import 'package:intl/intl.dart';
 
 import '../../widgets/file_explorer.dart';
 import '../../services/file_explorer.dart';
@@ -36,26 +37,33 @@ class HomePage extends GetView<HomePageController> {
                                   );
 
 
-  Widget get projectOpened => Scaffold(
-                                appBar: AppBar(
-                                  title: Obx(() => 
-                                    controller.fileOpened
-                                    ? Text(controller.fileName)
-                                    : Text(controller.projectName)
-                                  ),
-                                ),
-                                drawer: Drawer(
-                                  child: FileExplorer(
-                                    key: ValueKey(controller.projectPath),
-                                  ),
-                                ),
-                                body: controller.fileOpened
-                                    ? filePreivew
-                                    : null,
-                              );
+  Widget get projectOpened 
+  => Scaffold(
+      appBar: AppBar(
+        title: Obx(() => 
+          controller.fileOpened
+          ? Text(controller.fileName)
+          : Text(controller.projectName)
+        ),
+      ),
+      drawer: Drawer(
+        child: FileExplorer(
+          key: ValueKey(controller.projectPath),
+        ),
+      ),
+      body: controller.fileOpened
+          ? filePreivew
+          : null,
+      floatingActionButton: FloatingActionButton(
+        onPressed: controller.quickCreateSample,
+        tooltip: 'sample',
+        child: const Icon(Icons.add),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+    );
 
   Widget get filePreivew => Obx(() => 
-                              controller.fileLoading 
+                              controller.fileLoading || controller.isCreatingSample.value
                               ? const Center(child: CircularProgressIndicator(),)
                               : FilePreivew(
                                   key: ValueKey(controller.openedFile.path),
@@ -65,4 +73,5 @@ class HomePage extends GetView<HomePageController> {
                                   onDoubleTap: controller.doubleTapFilePreview,
                                 )
                             );
+  
 }

@@ -34,7 +34,10 @@ class FileExplorer extends StatelessWidget {
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [openDir],
+                            children: [
+                              openDir,
+                              refreshFileTree,
+                            ],
                           ),
                         );
   
@@ -48,11 +51,17 @@ class FileExplorer extends StatelessWidget {
                           onPressed: controller.pickDir,
                         );
 
+  Widget get refreshFileTree => IconButton(
+                              icon: const Icon(Icons.refresh),
+                              onPressed: controller.loadFileTree,
+                              tooltip: "Refresh file tree",
+                            );
+
   Widget get explorerSpace => Expanded(
                                 child: Obx(() => 
                                   controller.isLoading.value
                                   ? loading
-                                  : fileTree
+                                  : Obx(() => fileTree)
                                 ),
                               );
   

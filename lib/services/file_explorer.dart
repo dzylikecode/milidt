@@ -71,9 +71,8 @@ class FileExplorerService extends GetxService {
     if (node == selected.value) return;
     selected.value = node;
     if (node.entity is File) {
-      activeFile.value = node.entity as File;
       Get.back();
-      goToPreviewFile(activeFile.value!);
+      goToPreviewFile(node.entity as File);
     }
   }
 
@@ -171,13 +170,25 @@ class FileExplorerService extends GetxService {
   final fileContent = "".obs;
   var fileType = FilePreviewType.unknown;
   final fileLoading = false.obs;
-  void goToPreviewFile(File file) async {
+  Future<void> goToPreviewFile(File file) async {
+    activeFile.value = file;
     fileLoading.value = true;
     final (type, content) = await recognizedByExt(file) 
                             ?? await recognizedByContent(file);
     fileLoading.value = false;
     fileType = type;
     fileContent.value = content;
+  }
+
+  Future<File?> quickCreateSample(String relativePath) async {
+    final path = sysPath(relativePath);
+    final file = File(path);
+    if (await file.exists()) return null;
+    return file.create(recursive: true);
+
+    // 没法调用 createFile，因为 node 更新很奇怪
+    // 一开始没有 sample
+    // 后面有 sample 了，两次添加 node 不一样
   }
 }
 

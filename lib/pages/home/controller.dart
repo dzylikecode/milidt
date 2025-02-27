@@ -19,7 +19,7 @@ class HomePageController extends GetxController {
   String get fileContent => FileExplorerService.to.fileContent.value;
   bool get fileLoading => FileExplorerService.to.fileLoading.value;
 
-  void doubleTapFilePreview() async {
+  Future<void> doubleTapFilePreview() async {
     if (fileType == FilePreviewType.text
     || fileType == FilePreviewType.markdown
     ) {
@@ -31,5 +31,21 @@ class HomePageController extends GetxController {
         FileExplorerService.to.fileContent.value = ret.content!;
       }
     }
+  }
+
+  final isCreatingSample = false.obs;
+  void quickCreateSample() async {
+    isCreatingSample.value = true;
+    final now = DateTime.now();
+    final formattedDate = DateFormat('yyyy-MM-dd-HH-mm-ss').format(now);
+    final file = await FileExplorerService.to.quickCreateSample("/sample/$formattedDate/content.md");
+    if (file == null) {
+      isCreatingSample.value = false;
+      Get.snackbar("Error", "File already exists");
+      return;
+    }
+    await FileExplorerService.to.goToPreviewFile(file);
+    await doubleTapFilePreview();
+    isCreatingSample.value = false;
   }
 }

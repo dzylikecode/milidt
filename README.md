@@ -43,6 +43,13 @@ symbols:
 - :bulb: idea
 - :hammer: fix
 
+### 2025-02-27 23:59:18
+
+:sparkles: quick sample
+
+:bulb: long press to prompt the context menu, then select the delete option to delete the file/folder
+
+
 ### 2025-02-27 21:01:43
 
 :sparkles: markdown preview implementation:
