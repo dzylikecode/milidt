@@ -31,7 +31,6 @@ build anroid apk：
 flutter build apk
 ```
 
-
 ## timeline
 
 symbols:

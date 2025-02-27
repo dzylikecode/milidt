@@ -29,23 +29,41 @@ class MarkdownPreview extends StatelessWidget {
         HighlightBuilder.tag: HighlightBuilder(),
       },
       imageBuilder: (uri, title, alt) {
-        try {
-          if (uri.scheme == 'http' || uri.scheme == 'https') {
-            return Image.network(uri.toString());
-          } else {
-            final file = File(uri.toFilePath());
-            if (!file.existsSync()) {
-              throw Exception("File not found");
-            }
-            return Image.file(File(uri.toFilePath()));
-          }
-        } catch (e) {
-          return const Center(
-            child: Icon(
-              Icons.broken_image,
-              color: Colors.red,
-              size: 50.0,
-            ),
+        if (uri.scheme == 'http' || uri.scheme == 'https') {
+          return Image.network(
+            uri.toString(),
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Center(
+                child: CircularProgressIndicator(
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+                      : null,
+                ),
+              );
+            },
+            errorBuilder: (context, error, stackTrace) {
+              return const Center(
+                child: Icon(
+                  Icons.broken_image,
+                  color: Colors.red,
+                  size: 50.0,
+                ),
+              );
+            },
+          );
+        } else {
+          return Image.file(
+            File(uri.toFilePath()),
+            errorBuilder: (context, error, stackTrace) {
+              return const Center(
+                child: Icon(
+                  Icons.broken_image,
+                  color: Colors.red,
+                  size: 50.0,
+                ),
+              );
+            },
           );
         }
       },
