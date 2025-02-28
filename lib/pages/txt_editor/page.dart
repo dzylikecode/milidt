@@ -10,8 +10,8 @@ import 'dart:async';
 part 'controller.dart';
 part 'binding.dart';
 
-class TextFileEditorPage extends GetView<TextFileEditorPageController> {
-  const TextFileEditorPage({super.key});
+class TxtEditorPage extends GetView<TxtPageController> {
+  const TxtEditorPage({super.key});
 
   @override
   Widget build(BuildContext context) {

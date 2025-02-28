@@ -1,7 +1,7 @@
 part of 'page.dart';
 
-class TextFileEditorPageController extends GetxController {
-  final args = Get.arguments as TextFileEditorPageArgs;
+class TxtPageController extends GetxController {
+  final args = Get.arguments as TxtEditorPageArgs;
 
   File get file => args.file;
   String get initialContent => args.content;
@@ -18,14 +18,14 @@ class TextFileEditorPageController extends GetxController {
     if (didPop) return;
     // can't undo so the content is not changed
     if (!undoController.value.canUndo) {
-      Get.back(result: TextFileEditorPageRet());
+      Get.back(result: TxtEditorPageResult());
       return;
     }
     savingWhenGoBack.value = true;
     await saveFile(); // auto save
     final content = await file.readAsString();
     savingWhenGoBack.value = false;
-    Get.back(result: TextFileEditorPageRet(content: content));
+    Get.back(result: TxtEditorPageResult(content: content));
   }
   
   late StreamSubscription<bool> keyboardSubscription;
@@ -69,20 +69,20 @@ class TextFileEditorPageController extends GetxController {
   }
 }
 
-class TextFileEditorPageArgs {
+class TxtEditorPageArgs {
   final File file;
   final String content;
 
-  TextFileEditorPageArgs({
+  TxtEditorPageArgs({
     required this.file,
     required this.content,
   });
 }
 
-class TextFileEditorPageRet {
+class TxtEditorPageResult {
   final String? content;
 
-  TextFileEditorPageRet({
+  TxtEditorPageResult({
     this.content,
   });
 }

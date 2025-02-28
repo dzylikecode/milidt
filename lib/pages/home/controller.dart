@@ -20,12 +20,18 @@ class HomePageController extends GetxController {
   bool get fileLoading => FileExplorerService.to.fileLoading.value;
 
   Future<void> doubleTapFilePreview() async {
-    if (fileType == FilePreviewType.text
-    || fileType == FilePreviewType.markdown
-    ) {
-      final arguments = TextFileEditorPageArgs(file: openedFile, content: fileContent);
+    if (fileType == FilePreviewType.text) {
+      final arguments = TxtEditorPageArgs(file: openedFile, content: fileContent);
       // https://github.com/jonataslaw/getx/issues/734
-      final TextFileEditorPageRet ret = await Get.toNamed(Pages.textFileEditor.name, arguments: arguments);
+      final TxtEditorPageResult ret = await Get.toNamed(Pages.txtEditor.name, arguments: arguments);
+      // 常常可能误触，并没有更改内容
+      if (ret.content != null) {
+        FileExplorerService.to.fileContent.value = ret.content!;
+      }
+    } if (fileType == FilePreviewType.markdown) {
+      final arguments = MdEditorPageArgs(file: openedFile, content: fileContent);
+      // https://github.com/jonataslaw/getx/issues/734
+      final MdEditorPageResult ret = await Get.toNamed(Pages.mdEditor.name, arguments: arguments);
       // 常常可能误触，并没有更改内容
       if (ret.content != null) {
         FileExplorerService.to.fileContent.value = ret.content!;

@@ -13,10 +13,12 @@ part 'katex.dart';
 
 class MarkdownPreview extends StatelessWidget {
   final String content;
+  final String dir;
 
   const MarkdownPreview({
     super.key,
     this.content = '',
+    this.dir = '',
   });
 
   @override
@@ -53,8 +55,12 @@ class MarkdownPreview extends StatelessWidget {
             },
           );
         } else {
+          var path = uri.toFilePath();
+          if (path[0] != '/') {
+            path = '$dir/$path';
+          }
           return Image.file(
-            File(uri.toFilePath()),
+            File(path),
             errorBuilder: (context, error, stackTrace) {
               return const Center(
                 child: Icon(

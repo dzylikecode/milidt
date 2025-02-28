@@ -8,7 +8,8 @@ import '../../widgets/file_explorer.dart';
 import '../../services/file_explorer.dart';
 import '../../widgets/file_preview.dart';
 import '../pages.dart';
-import '../text_file_editor/page.dart';
+import '../txt_editor/page.dart';
+import '../md_editor/page.dart';
 
 part 'controller.dart';
 part 'binding.dart';

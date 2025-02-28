@@ -74,7 +74,10 @@ class FilePreivew extends StatelessWidget {
         ? TextFilePreviewContainer(
           child: textEmptyPrompt,
           )
-        : MarkdownPreview(content: content);
+        : MarkdownPreview(
+          content: content,
+          dir: file.parent.path,
+        );
 
 }
 

@@ -36,7 +36,6 @@ class FileExplorerService extends GetxService {
   void setRootDir(String newRootDir) {
     if (rootDir.value == newRootDir) return;
     rootDir.value = newRootDir;
-    // [ ] enhanced 最好改成异步加载，要不然耗时太长了
     loadFileTree();
     onRootDirChanged?.call(newRootDir);
   }
