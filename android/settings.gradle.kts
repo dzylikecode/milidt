@@ -10,11 +10,32 @@ pluginManagement {
     includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
 
     repositories {
+//        maven { setUrl("https://maven.aliyun.com/repository/central") }  
+//        maven { setUrl("https://maven.aliyun.com/repository/jcenter") }  
+//        maven { setUrl("https://maven.aliyun.com/repository/google") }  
+//        maven { setUrl("https://maven.aliyun.com/repository/gradle-plugin") }  
+//        maven { setUrl("https://maven.aliyun.com/repository/public") }  
+//        maven { setUrl("https://jitpack.io") }  
         google()
         mavenCentral()
         gradlePluginPortal()
     }
 }
+
+//dependencyResolutionManagement {  
+//    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)  
+//    repositories {  
+//        // 改为阿里云的镜像地址  
+//        maven { setUrl("https://maven.aliyun.com/repository/central") }  
+//        maven { setUrl("https://maven.aliyun.com/repository/jcenter") }  
+//        maven { setUrl("https://maven.aliyun.com/repository/google") }  
+//        maven { setUrl("https://maven.aliyun.com/repository/gradle-plugin") }  
+//        maven { setUrl("https://maven.aliyun.com/repository/public") }  
+//        maven { setUrl("https://jitpack.io") }  
+//        google()  
+//        mavenCentral()  
+//    }  
+//}
 
 plugins {
     id("dev.flutter.flutter-plugin-loader") version "1.0.0"

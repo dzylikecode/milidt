@@ -68,16 +68,22 @@ class MdEditorPageController extends GetxController {
     super.onClose();
   }
 
-  void pickImageFromGallery() async {
+  Future<void> pickImageFromGallery()
+  => _pickImageUtil(ImageSource.gallery);
+
+  Future<void> pickImageFromCamera()
+  => _pickImageUtil(ImageSource.camera);
+
+  Future<void> _pickImageUtil(ImageSource source) async {
     try {
       final image = await ImagePicker().pickImage(
-                      source: ImageSource.gallery,
+                      source: source,
                     );
       if (image == null) return;
       final fileName = basename(image.path);
       final markdownDirPath = dirname(file.path);
       final imagePath = "$markdownDirPath/images/$fileName";
-      // images folder 不存在会自动创建吗？
+      // images folder 不存在得自己创建
       final imagesDir = Directory("$markdownDirPath/images");
       if (!await imagesDir.exists()) {
         await imagesDir.create();
@@ -85,50 +91,34 @@ class MdEditorPageController extends GetxController {
       await File(image.path).copy(imagePath);
       final relativePath = 'images/$fileName';
       final imageMarkdown = "![image]($relativePath)";
-          // 插入图片链接到当前光标位置
-      final currentPosition = contentController.selection.baseOffset;
+      
+      // 插入图片链接到当前光标位置或末尾新行
       final text = contentController.text;
-      final newText = text.substring(0, currentPosition) + 
-                      imageMarkdown + 
-                      text.substring(currentPosition);
-      contentController.value = TextEditingValue(
-        text: newText,
-        selection: TextSelection.collapsed(offset: currentPosition + imageMarkdown.length),
-      );
+      String newText;
+      int newCursorPosition;
 
-      // 要自己调用
-      onContentChanged(newText);
-    } catch (e) {
-      Get.snackbar("Error", e.toString());
-    }
-  }
-
-  void pickImageFromCamera() async {
-    try {
-      final image = await ImagePicker().pickImage(
-                      source: ImageSource.camera,
-                    );
-      if (image == null) return;
-      final fileName = basename(image.path);
-      final markdownDirPath = dirname(file.path);
-      final imagePath = "$markdownDirPath/images/$fileName";
-      // images folder 不存在会自动创建吗？
-      final imagesDir = Directory("$markdownDirPath/images");
-      if (!await imagesDir.exists()) {
-        await imagesDir.create();
+      // 检查光标是否有效
+      // [ ] 等待测试一下
+      if (contentController.selection.baseOffset < 0) {
+        // 光标无效，添加到文本末尾的新行
+        if (text.isEmpty || text.endsWith('\n')) {
+          newText = text + imageMarkdown;
+        } else {
+          newText = text + '\n' + imageMarkdown;
+        }
+        newCursorPosition = newText.length;
+      } else {
+        // 光标有效，添加到当前光标位置
+        final currentPosition = contentController.selection.baseOffset;
+        newText = text.substring(0, currentPosition) + 
+                  imageMarkdown + 
+                  text.substring(currentPosition);
+        newCursorPosition = currentPosition + imageMarkdown.length;
       }
-      await File(image.path).copy(imagePath);
-      final relativePath = 'images/$fileName';
-      final imageMarkdown = "![image]($relativePath)";
-          // 插入图片链接到当前光标位置
-      final currentPosition = contentController.selection.baseOffset;
-      final text = contentController.text;
-      final newText = text.substring(0, currentPosition) + 
-                      imageMarkdown + 
-                      text.substring(currentPosition);
+
       contentController.value = TextEditingValue(
         text: newText,
-        selection: TextSelection.collapsed(offset: currentPosition + imageMarkdown.length),
+        selection: TextSelection.collapsed(offset: newCursorPosition),
       );
 
       // 要自己调用

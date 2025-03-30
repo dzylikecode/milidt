@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:path/path.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../widgets/file_explorer.dart';
 import '../../services/file_explorer.dart';
@@ -46,6 +47,13 @@ class HomePage extends GetView<HomePageController> {
           ? Text(controller.fileName)
           : Text(controller.projectName)
         ),
+        actions: [
+          Obx(() => 
+            controller.fileOpened
+            ? share
+            : const SizedBox()
+          ),
+        ],
       ),
       drawer: Drawer(
         child: FileExplorer(
@@ -75,4 +83,8 @@ class HomePage extends GetView<HomePageController> {
                                 )
                             );
   
+  Widget get share => IconButton(
+                      icon: const Icon(Icons.ios_share),
+                      onPressed: () => controller.shareFile(controller.openedFile.path),
+                    );
 }

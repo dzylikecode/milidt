@@ -43,6 +43,74 @@ symbols:
 - :bulb: idea
 - :hammer: fix
 
+### 2025-03-28 19:24:03
+
+It takes a long time to build the apk to debug, then I find the problem is proxy. (execute `flutter run -v` to see the log)
+
+:sparkles: [share files](https://pub.dev/packages/share_plus)
+
+:sparkles: [receive_sharing_intent](https://pub.dev/packages/receive_sharing_intent):
+
+```xml
+<activity
+    android:launchMode="singleTask"
+>
+      <intent-filter>
+          <action android:name="android.intent.action.SEND" />
+          <category android:name="android.intent.category.DEFAULT" />
+          <data android:mimeType="*/*" />
+      </intent-filter>
+      <intent-filter>
+          <action android:name="android.intent.action.SEND_MULTIPLE" />
+          <category android:name="android.intent.category.DEFAULT" />
+          <data android:mimeType="*/*" />
+      </intent-filter>
+</activity>
+```
+
+because of the compatibility, I override the version:
+
+```yaml
+dependency_overrides:
+  receive_sharing_intent:
+    git:
+      url: https://github.com/ravijadav812/receive_sharing_intent
+```
+
+Files will copy to the `/data/user/0/com.example.milidt/cache/` folder. If checking the file, I can run the below command:
+
+```bash
+adb shell
+run-as com.example.milidt
+ls
+
+# exit
+exit
+```
+
+I felt sad because I just write the wrong code, and it takes me a long time to find the problem. 
+
+```dart
+// wrong
+await File(targetPath).copy(sourcePath);
+// correct
+await File(sourcePath).copy(targetPath);
+```
+
+### 2025-02-28 15:26:06
+
+:bulb: [json preview](https://pub.dev/packages/flutter_json_view)
+
+### 2025-02-28 14:07:54
+
+:bulb: [receive_sharing_intent](https://pub.dev/packages/receive_sharing_intent)
+
+:bulb: markdown preview:
+
+If I want to preview the markdown when writing, I have to go back to the preview. But then I lost the history.
+
+:bulb: [share](https://pub.dev/packages/share_plus)
+
 ### 2025-02-28 12:19:45
 
 :sparkles: camera & gallery

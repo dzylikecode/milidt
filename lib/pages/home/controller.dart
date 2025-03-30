@@ -54,4 +54,9 @@ class HomePageController extends GetxController {
     await doubleTapFilePreview();
     isCreatingSample.value = false;
   }
+
+  Future<void> shareFile(String path) async {
+    final result = await Share.shareXFiles([XFile(path)]);
+    
+  }
 }
