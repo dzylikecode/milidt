@@ -43,6 +43,18 @@ symbols:
 - :bulb: idea
 - :hammer: fix
 
+### 2025-03-31 14:48:43
+
+I found that folder name can't be same as the file name in Android.
+
+```mermaid
+graph LR
+    A[User Operator] --> B[Guard]
+    B -->|Success| C[Operator]
+    C --> D[Render]
+    B -->|Failed| A
+```
+
 ### 2025-03-30 22:49:29
 
 :hammer: replace animated_tree_view with [two_dimensional_scrollables](https://pub.dev/packages/two_dimensional_scrollables):

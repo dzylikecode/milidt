@@ -127,6 +127,10 @@ class MdEditorPageController extends GetxController {
       Get.snackbar("Error", e.toString());
     }
   }
+
+  Future<void> download() async {
+    
+  }
 }
 
 class MdEditorPageArgs {

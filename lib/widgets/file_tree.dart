@@ -36,6 +36,8 @@ class FileTreeController extends GetxController {
   }
   void add(ExplorableNode parent, ExplorableNode child) {
     parent.children.add(child);
+    // 虽然可以二分插入，但是我懒
+    parent.children.sort((a, b) => _orderFS(a.content, b.content));
     update();
   }
   void remove(ExplorableNode child) {
@@ -54,7 +56,6 @@ class FileTreeController extends GetxController {
       children: children,
       expanded: node.isExpanded
     );
-    // 位置会变
     remove(node);
     add(node.parent ?? rootNode, newNode);
     update();
@@ -174,7 +175,7 @@ Map<Type, GestureRecognizerFactory> _getTapRecognizer({
   GestureTapCallback? onTap,
   GestureLongPressCallback? onLongPress,
 }) {
-  return <Type, GestureRecognizerFactory>{
+  return {
     TapGestureRecognizer:
         GestureRecognizerFactoryWithHandlers<TapGestureRecognizer>(
       () => TapGestureRecognizer(),
@@ -250,10 +251,12 @@ TreeViewNode<FileSystemEntity> _buildTreeUtil(FileSystemEntity item)
 
 List<TreeViewNode<FileSystemEntity>> _getChildrenUtil(Directory dir) {
   final children = dir.listSync();
-  children.sort((a, b) {
-    if (a is Directory && b is File)  return -1;
-    if (a is File && b is Directory)  return 1;
-                                      return a.path.compareTo(b.path);
-  });
+  children.sort(_orderFS);
   return children.map((e) => _buildTreeUtil(e)).toList();
+}
+
+int _orderFS(FileSystemEntity a, FileSystemEntity b) {
+  if (a is Directory && b is File) return -1;
+  if (a is File && b is Directory) return 1;
+  return a.path.compareTo(b.path);
 }

@@ -106,7 +106,6 @@ class FileExplorerService extends GetxService {
     dir.createSync(recursive: true);
     final firstSubDir = getFirstSubPath(contextFolder.content.path, path);
     fileTreeController.add(contextFolder, FileTree.buildTree(Directory(firstSubDir)));
-    // contextFolder.add(buildTree(firstSubDir));
   }
   String? validateCreateFolder(String? relativePath) {
     if (relativePath == null || relativePath.isEmpty) {

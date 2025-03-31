@@ -103,4 +103,9 @@ class MdEditorPage extends GetView<MdEditorPageController> {
     icon: Icon(Icons.camera_alt),
     onPressed: controller.pickImageFromCamera,
   );
+
+  Widget get download => IconButton(
+    icon: Icon(Icons.download),
+    onPressed: controller.download,
+  );
 }
