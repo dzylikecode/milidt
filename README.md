@@ -43,6 +43,13 @@ symbols:
 - :bulb: idea
 - :hammer: fix
 
+### 2025-03-30 22:49:29
+
+:hammer: replace animated_tree_view with [two_dimensional_scrollables](https://pub.dev/packages/two_dimensional_scrollables):
+
+https://www.youtube.com/watch?v=UDZ0LPQq-n8
+
+
 ### 2025-03-28 19:24:03
 
 It takes a long time to build the apk to debug, then I find the problem is proxy. (execute `flutter run -v` to see the log)
@@ -68,7 +75,7 @@ It takes a long time to build the apk to debug, then I find the problem is proxy
 </activity>
 ```
 
-because of the compatibility, I override the version:
+because of the compatibility(try to run `flutter analyze --suggestions`), I override the version:
 
 ```yaml
 dependency_overrides:

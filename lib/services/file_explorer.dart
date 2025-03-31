@@ -7,7 +7,9 @@ import 'package:path/path.dart';
 import 'dart:io';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:animated_tree_view/animated_tree_view.dart';
+import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
+
+import '../widgets/file_tree.dart';
 
 class FileExplorerService extends GetxService {
   static FileExplorerService get to => Get.find();
@@ -40,15 +42,14 @@ class FileExplorerService extends GetxService {
     onRootDirChanged?.call(newRootDir);
   }
 
-  final selected = Rx<ExplorableNode?>(null);
-  final _cacheFileTree = ExplorableNode().obs;
-  ExplorableNode get fileTree => _cacheFileTree.value;
+  final fileTreeController = FileTreeController();
+  ExplorableNode get fileTree => fileTreeController.rootNode;
   final isLoading = false.obs;
   Future<void> loadFileTree() async {
     isLoading.value = true;
     try {
       // 使用 compute 函数在后台线程中加载文件夹内容
-      _cacheFileTree.value = await compute(buildTree, rootDir.value);
+      fileTreeController.rootNode = await compute(FileTree.buildTree, Directory(rootDir.value));
     } catch (e) {
       Get.snackbar("Error", "Failed to load folder contents");
     } finally {
@@ -56,22 +57,18 @@ class FileExplorerService extends GetxService {
     }
   }
 
-  void clearSelected() {
-    selected.value = null;
-  }
-
-  bool isSelected(ExplorableNode node) => selected.value == node;
-
   void onTapBackground() {
-    clearSelected();
+    fileTreeController.clearSelected();
   }
-
+  void onTapDown(ExplorableNode node) {
+    fileTreeController.selected = node;
+  }
   void onTapExplorable(ExplorableNode node) {
-    if (node == selected.value) return;
-    selected.value = node;
-    if (node.entity is File) {
+    if (node.content is File) {
       Get.back();
-      goToPreviewFile(node.entity as File);
+      goToPreviewFile(node.content as File);
+    } else if (node.content is Directory) {
+      fileTreeController.toggleNode(node);
     }
   }
 
@@ -89,10 +86,10 @@ class FileExplorerService extends GetxService {
                               );
   ExplorableNode get contextFolder {
     // 一定要是 fileTree，因为后续的 add 会用到
-    final contextItem = selected.value ?? fileTree;
-    return switch (contextItem.entity) {
+    final contextItem = fileTreeController.selected ?? fileTree;
+    return switch (contextItem.content) {
       Directory _ => contextItem,
-      _           => contextItem.parent! as ExplorableNode,
+      _           => contextItem.parent ?? fileTree,
     };
   }
   String sysPath(String path) {
@@ -100,15 +97,16 @@ class FileExplorerService extends GetxService {
       final rel = path.substring(1);
       return join(rootDir.value, rel);
     }
-    return join(contextFolder.entity.path, path);
+    return join(contextFolder.content.path, path);
   }
 
   void createFolder(String relativePath) {
     final path = sysPath(relativePath);
     final dir = Directory(path);
     dir.createSync(recursive: true);
-    final firstSubDir = getFirstSubPath(contextFolder.entity.path, path);
-    contextFolder.add(buildTree(firstSubDir));
+    final firstSubDir = getFirstSubPath(contextFolder.content.path, path);
+    fileTreeController.add(contextFolder, FileTree.buildTree(Directory(firstSubDir)));
+    // contextFolder.add(buildTree(firstSubDir));
   }
   String? validateCreateFolder(String? relativePath) {
     if (relativePath == null || relativePath.isEmpty) {
@@ -125,11 +123,13 @@ class FileExplorerService extends GetxService {
     final path = sysPath(relativePath);
     final file = File(path);
     file.createSync(recursive: true);
-    final firstSubDir = getFirstSubPath(contextFolder.entity.path, path);
-    contextFolder.add(firstSubDir == path
-                      ? ExplorableNode(data: file)
-                      : buildTree(firstSubDir)
-                      );
+    final firstSubDir = getFirstSubPath(contextFolder.content.path, path);
+    
+    fileTreeController.add(contextFolder, 
+      firstSubDir == path
+      ? FileTree.buildTree(file)
+      : FileTree.buildTree(Directory(firstSubDir))
+    );
   }
 
   String? validateCreateFile(String? relativePath) {
@@ -143,6 +143,53 @@ class FileExplorerService extends GetxService {
     return null;
   }
   void onLongPressExplorable(ExplorableNode node) {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text("Rename"),
+              onTap: () {
+                Get.back();
+                createFSDialog(
+                  title: 'Rename',
+                  onSubmit: (newName) async {
+                    final newPath = join(
+                      dirname(node.content.path),
+                      newName,
+                    );
+                    final fs = node.content;
+                    await fs.rename(newPath);
+                    fileTreeController.rename(node, newPath);
+                  },
+                  initValue: basename(node.content.path),
+                );
+              },
+            ),
+            ListTile(
+              title: const Text("Delete"),
+              onTap: () {
+                Get.back();
+                deleteFSDialogUtil(
+                  title: 'Delete',
+                  onDelete: () async {
+                    final fs = node.content;
+                    await fs.delete(recursive: true);
+                    fileTreeController.remove(node);
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),
+    );
   }
 
   void createFSDialog({
@@ -200,52 +247,6 @@ Future<bool> requestStoragePermission() async {
   return status.isGranted;
 }
 
-typedef ExplorableNode = TreeNode<FileSystemEntity>;
-
-extension FileSystemEntityX on FileSystemEntity {
-  String get pathKey => switch(this) {
-    Directory dir   => "dir/${dir.path}".hashCode.toString(),
-    File      file  => "file/${file.path}".hashCode.toString(),
-    Link      link  => "link/${link.path}".hashCode.toString(),
-    _               => "unknown/$path".hashCode.toString(),
-  };
-}
-
-extension ExplorableExt on ExplorableNode {
-  String get name => basename(data?.path ?? "");
-  FileSystemEntity get entity => data!;
-}
-
-
-
-ExplorableNode buildTree(String path) {
-  return _buildTreeUtil(Directory(path));
-}
-
-ExplorableNode _buildTreeUtil(FileSystemEntity item) {
-  return switch(item) {
-    Directory dir => ExplorableNode(
-                      data: item,
-                      key: item.pathKey,
-                    )
-                    ..addAll(_getChildrenUtil(dir)),
-    _             => ExplorableNode(
-                      data: item,
-                      key: item.pathKey,
-                    ),
-  };
-}
-
-Iterable<ExplorableNode> _getChildrenUtil(Directory dir) {
-  final children = dir.listSync();
-  children.sort((a, b) {
-    if (a is Directory && b is File)  return -1;
-    if (a is File && b is Directory)  return 1;
-                                      return a.path.compareTo(b.path);
-  });
-  return children.map((e) => _buildTreeUtil(e));
-}
-
 void createFSDialogUtil({
   required String title,
   required GlobalKey<FormState> formKey,
@@ -278,7 +279,30 @@ void createFSDialogUtil({
     actions: [
       TextButton(
         onPressed: () => submit(controller.text),
-        child: const Text("Create"),
+        child: const Text("Confirm"),
+      ),
+      TextButton(
+        onPressed: Get.back,
+        child: const Text("Cancel"),
+      ),
+    ],
+  );
+}
+
+void deleteFSDialogUtil({
+  required String title,
+  required void Function() onDelete,
+}) {
+  Get.defaultDialog(
+    title: title,
+    content: const Text("Are you sure you want to delete this file?"),
+    actions: [
+      TextButton(
+        onPressed: () {
+          onDelete(); 
+          Get.back();
+        },
+        child: const Text("Confirm"),
       ),
       TextButton(
         onPressed: Get.back,
@@ -314,7 +338,12 @@ Future<(FilePreviewType, String)?> recognizedByExt(File file) async {
 }
 
 Future<(FilePreviewType, String)> recognizedByContent(File file) async {
-  final content = await file.readAsString();
+  var content = "";
+  try {
+    content = await file.readAsString();
+  } catch (e) {
+    return (FilePreviewType.unknown, "");
+  }
   if (content.isEmpty && await file.length() > 0) {
     return (FilePreviewType.unknown, "");
   }
