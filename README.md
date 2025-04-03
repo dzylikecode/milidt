@@ -3,6 +3,7 @@
 What is life? It's too profound. Let's break it down with calculus. Life can be seen as a series of integrals:
 
 <!-- e is kind of like t -->
+
 <!-- how to write f like d? -->
 
 $$
@@ -43,6 +44,17 @@ symbols:
 - :bulb: idea
 - :hammer: fix
 
+### 2025-03-31 18:51:32
+
+:bulb: draw: https://github.com/saber-notes/saber
+
+### 2025-03-31 16:35:05
+
+:sparkles: download files:
+
+[style](https://docs.flutter.dev/cookbook/effects/download-button)
+
+
 ### 2025-03-31 14:48:43
 
 I found that folder name can't be same as the file name in Android.
@@ -60,7 +72,6 @@ graph LR
 :hammer: replace animated_tree_view with [two_dimensional_scrollables](https://pub.dev/packages/two_dimensional_scrollables):
 
 https://www.youtube.com/watch?v=UDZ0LPQq-n8
-
 
 ### 2025-03-28 19:24:03
 
@@ -134,13 +145,11 @@ If I want to preview the markdown when writing, I have to go back to the preview
 
 :sparkles: camera & gallery
 
-
 ### 2025-02-27 23:59:18
 
 :sparkles: quick sample
 
 :bulb: long press to prompt the context menu, then select the delete option to delete the file/folder
-
 
 ### 2025-02-27 21:01:43
 
@@ -168,7 +177,7 @@ If I want to preview the markdown when writing, I have to go back to the preview
   ```
 
 - block: 
-
+  
   ```txt
   \$\$(?:\\\$|[^$]|\n(?!\n))+\$\$|\\\[(?:[^\\[]|\n(?!\n))+?\\\]
   ```
@@ -194,7 +203,6 @@ if (result.content != null) {
   // do something
 }
 ```
-
 
 ### 2025-02-25 17:12:38
 

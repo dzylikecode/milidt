@@ -99,6 +99,8 @@ class MdEditorPageController extends GetxController {
 
       // 检查光标是否有效
       // [ ] 等待测试一下
+      // [ ] 还要处理光标位置，希望能在图片后面
+      // 我碰到的问题是，直接插入图片是没有显示光标的
       if (contentController.selection.baseOffset < 0) {
         // 光标无效，添加到文本末尾的新行
         if (text.isEmpty || text.endsWith('\n')) {
@@ -128,8 +130,30 @@ class MdEditorPageController extends GetxController {
     }
   }
 
-  Future<void> download() async {
-    
+  Future<void> openDownloadDialog() async {
+    final dio = Dio();
+    Get.defaultDialog(
+      title: "Download",
+      content: const Text("Download"),
+      actions: [
+        TextButton(
+          onPressed: () async {
+            // final path = await FileExplorerService.to.downloadFile(file.path);
+            // if (path != null) {
+            //   Get.snackbar("Success", "File downloaded to $path");
+            // } else {
+            //   Get.snackbar("Error", "Failed to download file");
+            // }
+            // Get.back();
+          },
+          child: const Text("Download"),
+        ),
+        TextButton(
+          onPressed: () => Get.back(),
+          child: const Text("Cancel"),
+        ),
+      ],
+    );
   }
 }
 

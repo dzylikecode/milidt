@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
 import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 import 'package:flutter/gestures.dart';
@@ -9,6 +10,9 @@ import 'package:path/path.dart';
 typedef ExplorableNode = TreeViewNode<FileSystemEntity>;
 
 class FileTreeController extends GetxController {
+  final verticalController = ScrollController();
+  final horizontalController = ScrollController();
+
   ExplorableNode? _selectedNode;
   set selected(ExplorableNode? node) {
     _selectedNode = node;
@@ -22,77 +26,207 @@ class FileTreeController extends GetxController {
   void clearSelected() {
     selected = null;
   }
-
-  final treeController = TreeViewController();
   ExplorableNode _rootNode = ExplorableNode(Directory(""));
   set rootNode(ExplorableNode node) {
     _rootNode = node;
     update();
   }
   ExplorableNode get rootNode => _rootNode;
+  bool outOfRoot(String path) => !_isSubPath(rootNode.content.path, path);
+  String sysPath(String path) {
+    if (path[0] == '/') {
+      final rel = path.substring(1);
+      return join(rootNode.content.path, rel);
+    }
+    return join(contextFolder.content.path, path);
+  }
+
+  ExplorableNode get contextFolder {
+    final contextItem = selected ?? rootNode;
+    return switch (contextItem.content) {
+      Directory _ => contextItem,
+      _           => contextItem.parent ?? rootNode, // 顶层的没有设置 parent
+    };
+  }
+
+  Future<void> load(String path) async {
+    final oldRoot = rootNode;
+    rootNode = await _buildTreeUtil(Directory(path), oldRoot);
+    // 重新设置选中状态
+    if (_selectedNode != null) {
+      _selectedNode = _getNodeByPath(rootNode, _selectedNode!.content.path);
+    }
+  }
+
+  final treeController = TreeViewController();
 
   void toggleNode(ExplorableNode node) {
     treeController.toggleNode(node);
   }
-  void add(ExplorableNode parent, ExplorableNode child) {
-    parent.children.add(child);
-    // 虽然可以二分插入，但是我懒
-    parent.children.sort((a, b) => _orderFS(a.content, b.content));
-    update();
+  void expandAll() {
+    treeController.expandAll();
   }
-  void remove(ExplorableNode child) {
-    if (child == selected) clearSelected();
-    final parent = child.parent ?? rootNode;
-    parent.children.remove(child);
-    update();
+  void collapseAll() {
+    treeController.collapseAll();
   }
-  void rename(ExplorableNode node, String newPath) {
-    final (newFs, children) = switch(node.content) {
-      Directory _ => (Directory(newPath), FileTree.buildChildren(Directory(newPath))),
-      _ => (File(newPath), null),
-    };
-    final newNode = ExplorableNode(
-      newFs,
-      children: children,
-      expanded: node.isExpanded
+  ExplorableNode? getNode(String path) => _getNodeByPath(rootNode, path);
+  void expandToRoot(ExplorableNode node) => _expandToRoot(rootNode, node);
+
+  String? validateCreate(String? relativePath) {
+    if (relativePath == null || relativePath.isEmpty) {
+      return "cannot be empty";
+    }
+    final path = sysPath(relativePath);
+    if (outOfRoot(path)) {
+      return "out of root dir";
+    }
+    // 安卓不能文件与文件夹同名
+    if (Directory(path).existsSync() || File(path).existsSync()) {
+      return "already exists";
+    }
+    return null;
+  }
+
+  String? validateRename(String oldName, String? newName) {
+    if (newName == null || newName.isEmpty) {
+      return "cannot be empty";
+    }
+    if (newName.contains(Platform.pathSeparator)) {
+      return "cannot contain path separator";
+    }
+    if (newName.split('').every((char) => char == '.')) {
+      return "cannot be all dots";
+    }
+    final newPath = join(
+      dirname(oldName),
+      newName,
     );
-    remove(node);
-    add(node.parent ?? rootNode, newNode);
+    // 安卓不能文件与文件夹同名
+    if (Directory(newPath).existsSync() || File(newPath).existsSync()) {
+      return "already exists";
+    }
+    return null;
+  }
+
+  Future<ExplorableNode> createDirOP(String dirPath) async {
+    final parent = dirname(dirPath);
+    var parentNode = getNode(parent) ?? await createDirOP(parent);
+    final dir = Directory(dirPath);
+    await dir.create(recursive: false);
+    final newNode = ExplorableNode(dir);
+    parentNode.children.add(newNode);
+    // 虽然可以二分插入，但是我懒
+    parentNode.children.sort((a, b) => _orderFS(a.content, b.content));
+    return newNode;
+  }
+
+  Future<void> createDir(String dirPath) async {
+    final dirNode = await createDirOP(dirPath);
+    expandToRoot(dirNode); // 会改变 node，所以要重新获取
+    _selectedNode = getNode(dirPath);
     update();
+  }
+
+  Future<void> createFileOP(String path) async {
+    final parent = dirname(path);
+    var parentNode = getNode(parent) ?? await createDirOP(parent);
+    final file = File(path);
+    await file.create(recursive: false);
+    final newNode = ExplorableNode(file);
+    parentNode.children.add(newNode);
+    parentNode.children.sort((a, b) => _orderFS(a.content, b.content));
+  }
+
+  Future<void> createFile(String path) async {
+    await createFileOP(path);
+    final node = getNode(path);
+    expandToRoot(node!);
+    _selectedNode = getNode(path);
+    update();
+  }
+
+  Future<void> removeOP(ExplorableNode node) async {
+    final fs = node.content;
+    await fs.delete(recursive: true);
+    final parent = node.parent ?? rootNode;
+    parent.children.remove(node);
+  }
+
+  Future<void> remove(ExplorableNode node) async {
+    await removeOP(node);
+    if (node == selected) clearSelected();
+    update();
+  }
+
+  Future<void> renameFileOP(ExplorableNode node, String newPath) async {
+    final fs = node.content;
+    final parent = node.parent ?? rootNode;
+    await fs.rename(newPath);
+    parent.children.remove(node);
+    final newNode = ExplorableNode(File(newPath));
+    parent.children.add(newNode);
+    parent.children.sort((a, b) => _orderFS(a.content, b.content));
+  }
+
+  Future<void> renameFile(ExplorableNode node, String newPath) async {
+    await renameFileOP(node, newPath);
+    _selectedNode = getNode(newPath);
+    update();
+  }
+
+  Future<void> renameFolderOP(ExplorableNode node, String newPath) async {
+    final fs = node.content;
+    final parent = node.parent ?? rootNode;
+    await fs.rename(newPath);
+    parent.children.remove(node);
+    final newNode = _renameFileTree(node, fs.path, newPath);
+    parent.children.add(newNode);
+    parent.children.sort((a, b) => _orderFS(a.content, b.content));
+  }
+
+  Future<void> renameFolder(ExplorableNode node, String newPath) async {
+    await renameFolderOP(node, newPath);
+    _selectedNode = getNode(newPath);
+    update();
+  }
+
+  Future<void> rename(ExplorableNode node, String newPath) async {
+    if (node.content is Directory) {
+      await renameFolder(node, newPath);
+    } else {
+      await renameFile(node, newPath);
+    }
   }
 }
 
 
 
-
-
 class FileTree extends StatelessWidget {
-  final verticalController = ScrollController();
-  final horizontalController = ScrollController();
-  final TreeViewController controller;
 
-  final List<TreeViewNode<FileSystemEntity>> tree;
-  final TreeRow Function(TreeViewNode<FileSystemEntity>)? rowBuilder;
+  final FileTreeController controller;
+
+  final List<ExplorableNode> tree;
+  final TreeRow Function(ExplorableNode)? rowBuilder;
   final Widget Function(
     BuildContext context,
-    TreeViewNode<FileSystemEntity> node,
+    ExplorableNode node,
     AnimationStyle toggleAnimationStyle,
   )? nodeBuilder;
 
-  FileTree({
+  const FileTree({
     super.key,
     required this.tree,
-    FileTreeController? controller,
+    required this.controller,
     this.rowBuilder,
     this.nodeBuilder,
-  }) : controller = controller?.treeController ?? TreeViewController();
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scrollbar(
-      controller: verticalController,
+      controller: controller.verticalController,
       child: Scrollbar(
-        controller: horizontalController,
+        controller: controller.horizontalController,
         child: treeUI,
       )
     );
@@ -101,12 +235,12 @@ class FileTree extends StatelessWidget {
   Widget get treeUI
   => TreeView<FileSystemEntity>(
       verticalDetails: ScrollableDetails.vertical(
-        controller: verticalController,
+        controller: controller.verticalController,
       ),
       horizontalDetails: ScrollableDetails.horizontal(
-        controller: horizontalController,
+        controller: controller.horizontalController,
       ),
-      controller: controller,
+      controller: controller.treeController,
       tree: tree,
       treeRowBuilder: rowBuilder ?? TreeView.defaultTreeRowBuilder,
       treeNodeBuilder: nodeBuilder ?? TreeView.defaultTreeNodeBuilder,
@@ -162,12 +296,6 @@ class FileTree extends StatelessWidget {
       ],
     );
   }
-
-  static TreeViewNode<FileSystemEntity> buildTree(FileSystemEntity item)
-  => _buildTreeUtil(item);
-
-  static List<TreeViewNode<FileSystemEntity>> buildChildren(Directory dir) 
-  => _getChildrenUtil(dir);
 }
 
 Map<Type, GestureRecognizerFactory> _getTapRecognizer({
@@ -238,25 +366,72 @@ IconData _specailFileIcon(String name) {
 
 
 
-TreeViewNode<FileSystemEntity> _buildTreeUtil(FileSystemEntity item) 
+Future<ExplorableNode> _buildTreeUtil(FileSystemEntity item, ExplorableNode oldState) async 
 => switch(item) {
-  Directory _ => TreeViewNode<FileSystemEntity>(
+  Directory _ => ExplorableNode(
                     item,
-                    children: _getChildrenUtil(item),
+                    children: await _getChildrenUtil(item, oldState),
+                    expanded: _getNodeByPath(oldState, item.path)?.isExpanded ?? false,
                   ),
-  _           => TreeViewNode<FileSystemEntity>(
+  _           => ExplorableNode(
                     item,
                   ),
 };
 
-List<TreeViewNode<FileSystemEntity>> _getChildrenUtil(Directory dir) {
-  final children = dir.listSync();
+Future<List<ExplorableNode>> _getChildrenUtil(Directory dir, ExplorableNode oldState) async {
+  final children = await dir.list().toList();
   children.sort(_orderFS);
-  return children.map((e) => _buildTreeUtil(e)).toList();
+  return Future.wait(children.map((e) => _buildTreeUtil(e, oldState)));
 }
 
 int _orderFS(FileSystemEntity a, FileSystemEntity b) {
   if (a is Directory && b is File) return -1;
   if (a is File && b is Directory) return 1;
   return a.path.compareTo(b.path);
+}
+
+ExplorableNode? _getNodeByPath(
+  ExplorableNode root,
+  String path,
+) {
+  if (root.content.path == path) return root;
+  // 找到父目录
+  final matchDir = root.children.firstWhereOrNull((e) => _isSubPath(e.content.path, path));
+  if (matchDir == null) return null;
+  return _getNodeByPath(matchDir, path);
+}
+
+bool _isSubPath(String parent, String child) {
+  if (parent == child) return true;
+  // 确保路径以路径分隔符结尾
+  if (!parent.endsWith(Platform.pathSeparator)) {
+    parent += Platform.pathSeparator;
+  }
+  return child.startsWith(parent);
+}
+
+ExplorableNode _renameFileTree(ExplorableNode root, String oldName, String newName) {
+  return ExplorableNode(
+    switch (root.content) {
+      Directory _ => Directory(root.content.path.replaceAll(oldName, newName)),
+      _ => File(root.content.path.replaceAll(oldName, newName)),
+    },
+    children: root.children.map((e) => _renameFileTree(e, oldName, newName)).toList(),
+    expanded: root.isExpanded,
+  );
+}
+
+ExplorableNode _expandToRoot(ExplorableNode root, ExplorableNode leaf) {
+  final parentPath = dirname(leaf.content.path);
+  final parentNode = _getNodeByPath(root, parentPath);
+  if (parentNode == null) throw Exception("Parent node not found");
+  parentNode.children.remove(leaf);
+  parentNode.children.add(ExplorableNode(
+    leaf.content,
+    children: leaf.children,
+    expanded: true,
+  ));
+  parentNode.children.sort((a, b) => _orderFS(a.content, b.content));
+  if (parentNode == root) return root;
+  return _expandToRoot(root, parentNode);
 }

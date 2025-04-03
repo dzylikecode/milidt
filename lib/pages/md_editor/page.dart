@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
@@ -106,6 +107,6 @@ class MdEditorPage extends GetView<MdEditorPageController> {
 
   Widget get download => IconButton(
     icon: Icon(Icons.download),
-    onPressed: controller.download,
+    onPressed: controller.openDownloadDialog,
   );
 }
