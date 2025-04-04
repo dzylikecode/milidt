@@ -44,6 +44,23 @@ symbols:
 - :bulb: idea
 - :hammer: fix
 
+### 2025-04-04 16:56:47
+
+:sparkles: image [preview](https://pub.dev/packages/photo_view) & share
+
+:hammer: keep scroller position when toggling the file explorer:
+
+I don't know why I need to create like this:
+
+```dart
+GetBuilder<FileTreeController>(
+  init: controller.fileTreeController, //here
+  initState: (state) => controller.fileTreeController.onInit(),
+  dispose: (state) => controller.fileTreeController.onClose(),
+  builder: (_) => fileTree,
+)
+```
+
 ### 2025-03-31 18:51:32
 
 :bulb: draw: https://github.com/saber-notes/saber
