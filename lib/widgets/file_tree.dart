@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/state_manager.dart';
 import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 import 'package:flutter/gestures.dart';
 import 'package:path/path.dart';
@@ -12,6 +11,34 @@ typedef ExplorableNode = TreeViewNode<FileSystemEntity>;
 class FileTreeController extends GetxController {
   final verticalController = ScrollController();
   final horizontalController = ScrollController();
+
+  double _verticalScrollOffset = 0.0;
+  double _horizontalScrollOffset = 0.0;
+
+  @override
+  void onInit() {
+    super.onInit();
+    verticalController.addListener(_saveVerticalScrollOffset);
+    horizontalController.addListener(_saveHorizontalScrollOffset);
+
+    // restore scroll offset
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      verticalController.jumpTo(_verticalScrollOffset);
+      horizontalController.jumpTo(_horizontalScrollOffset);
+    });
+  }
+  void _saveVerticalScrollOffset() {
+    _verticalScrollOffset = verticalController.offset;
+  }
+  void _saveHorizontalScrollOffset() {
+    _horizontalScrollOffset = horizontalController.offset;
+  }
+  @override
+  void onClose() {
+    verticalController.removeListener(_saveVerticalScrollOffset);
+    horizontalController.removeListener(_saveHorizontalScrollOffset);
+    super.onClose();
+  }
 
   ExplorableNode? _selectedNode;
   set selected(ExplorableNode? node) {
@@ -53,8 +80,8 @@ class FileTreeController extends GetxController {
     final oldRoot = rootNode;
     rootNode = await _buildTreeUtil(Directory(path), oldRoot);
     // 重新设置选中状态
-    if (_selectedNode != null) {
-      _selectedNode = _getNodeByPath(rootNode, _selectedNode!.content.path);
+    if (selected != null) {
+      selected = _getNodeByPath(rootNode, selected!.content.path);
     }
   }
 
@@ -87,7 +114,7 @@ class FileTreeController extends GetxController {
     return null;
   }
 
-  String? validateRename(String oldName, String? newName) {
+  String? validateRename(String oldPath, String? newName) {
     if (newName == null || newName.isEmpty) {
       return "cannot be empty";
     }
@@ -97,10 +124,8 @@ class FileTreeController extends GetxController {
     if (newName.split('').every((char) => char == '.')) {
       return "cannot be all dots";
     }
-    final newPath = join(
-      dirname(oldName),
-      newName,
-    );
+    final newPath = join(dirname(oldPath), newName,);
+    if (newPath == oldPath) return null;
     // 安卓不能文件与文件夹同名
     if (Directory(newPath).existsSync() || File(newPath).existsSync()) {
       return "already exists";
@@ -123,7 +148,7 @@ class FileTreeController extends GetxController {
   Future<void> createDir(String dirPath) async {
     final dirNode = await createDirOP(dirPath);
     expandToRoot(dirNode); // 会改变 node，所以要重新获取
-    _selectedNode = getNode(dirPath);
+    selected = getNode(dirPath);
     update();
   }
 
@@ -141,7 +166,7 @@ class FileTreeController extends GetxController {
     await createFileOP(path);
     final node = getNode(path);
     expandToRoot(node!);
-    _selectedNode = getNode(path);
+    selected = getNode(path);
     update();
   }
 
@@ -170,7 +195,7 @@ class FileTreeController extends GetxController {
 
   Future<void> renameFile(ExplorableNode node, String newPath) async {
     await renameFileOP(node, newPath);
-    _selectedNode = getNode(newPath);
+    selected = getNode(newPath);
     update();
   }
 
@@ -186,7 +211,7 @@ class FileTreeController extends GetxController {
 
   Future<void> renameFolder(ExplorableNode node, String newPath) async {
     await renameFolderOP(node, newPath);
-    _selectedNode = getNode(newPath);
+    selected = getNode(newPath);
     update();
   }
 

@@ -68,19 +68,32 @@ class FileExplorer extends StatelessWidget {
                                   ? loading
                                   : GetBuilder<FileTreeController>(
                                       init: controller.fileTreeController, //here
+                                      initState: (state) => controller.fileTreeController.onInit(),
+                                      dispose: (state) => controller.fileTreeController.onClose(),
                                       builder: (_) => fileTree,
                                     )
                                 ),
                               );
   
-  Widget get footer =>  Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            createFolder,
-                            createFile,
-                            Obx(() => toggleAll),
-                          ],
-                        );
+  Widget get footer 
+  => Container(
+    decoration: BoxDecoration(
+      border: Border(
+        top: BorderSide(
+          color: Colors.grey.withValues(alpha: 0.8),
+          width: 0.5,
+        ),
+      ),
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        createFolder,
+        createFile,
+        toggleAll,
+      ],
+    ),
+  );
   
   Widget get createFolder => IconButton(
                               icon: const Icon(Icons.create_new_folder),
@@ -96,12 +109,13 @@ class FileExplorer extends StatelessWidget {
                           child: CircularProgressIndicator(),
                         );
 
-  Widget get toggleAll => IconButton(
-                            icon: controller.allIsExpanded.value
-                                  ? const Icon(Icons.expand_less)
-                                  : const Icon(Icons.expand_more),
-                            onPressed: controller.toggleAll,
-                          );
+  Widget get toggleAll => Obx(()
+  => IconButton(
+    icon: controller.allIsExpanded.value
+          ? const Icon(Icons.expand_less)
+          : const Icon(Icons.expand_more),
+    onPressed: controller.toggleAll,
+  ));
 
   Widget get fileTree 
   => FileTree(
