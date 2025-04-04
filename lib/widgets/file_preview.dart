@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../services/file_explorer.dart';
 import 'file_preview/markdown/markdown.dart';
+import 'image_view.dart';
 
 class FilePreivew extends StatelessWidget {
   final File file;
@@ -36,7 +37,7 @@ class FilePreivew extends StatelessWidget {
 
   Widget get unknownedBinaryFile => const Text("Unknowned binary file");
 
-  Widget get image => Center(child: Image.file(file));
+  Widget get image => Center(child: ImageView.file(file));
 
   Widget get textContentPreview 
   => SelectableText(

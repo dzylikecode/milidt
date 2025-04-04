@@ -49,6 +49,7 @@ dependencies:
   receive_sharing_intent: ^1.8.1
   two_dimensional_scrollables: ^0.3.3
   dio: ^5.8.0+1
+  photo_view: ^0.15.0
 
 
 dependency_overrides:

@@ -2,8 +2,11 @@ import 'package:flutter_markdown/flutter_markdown.dart' as render_md;
 import 'package:flutter/material.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:flutter_markdown_latex/flutter_markdown_latex.dart';
+import 'package:path/path.dart';
 import 'dart:io';
 
+
+import '../../image_view.dart';
 
 import 'code_block.dart';
 
@@ -32,45 +35,13 @@ class MarkdownPreview extends StatelessWidget {
       },
       imageBuilder: (uri, title, alt) {
         if (uri.scheme == 'http' || uri.scheme == 'https') {
-          return Image.network(
-            uri.toString(),
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Center(
-                child: CircularProgressIndicator(
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
-                      : null,
-                ),
-              );
-            },
-            errorBuilder: (context, error, stackTrace) {
-              return const Center(
-                child: Icon(
-                  Icons.broken_image,
-                  color: Colors.red,
-                  size: 50.0,
-                ),
-              );
-            },
-          );
+          return ImageView.network(uri.toString());
         } else {
           var path = uri.toFilePath();
           if (path[0] != '/') {
-            path = '$dir/$path';
+            path = join(dir, path);
           }
-          return Image.file(
-            File(path),
-            errorBuilder: (context, error, stackTrace) {
-              return const Center(
-                child: Icon(
-                  Icons.broken_image,
-                  color: Colors.red,
-                  size: 50.0,
-                ),
-              );
-            },
-          );
+          return ImageView.file(File(path));
         }
       },
       extensionSet: md.ExtensionSet(
