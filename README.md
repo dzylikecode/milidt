@@ -44,6 +44,42 @@ symbols:
 - :bulb: idea
 - :hammer: fix
 
+### 2025/04/05 00:27:45
+
+:sparkles: [app icon](https://pub.dev/packages/icons_launcher):
+
+- generate tools: [canva](https://www.canva.com/design/DAGjsFR0PGw/5ORf4v--ZdJiq-BjFJ-l8Q/edit?referrer=icons-landing-page)
+- ~~icon match: [appicon.co](https://appicon.co/)~~ There is no need to use it, because the `flutter_launcher_icons` can generate the icons automatically.
+
+step:
+
+1. configure the `pubspec.yaml`:
+
+```yaml
+icons_launcher:
+  image_path: "assets/app_icon.png"
+  platforms:
+    android:
+      enable: true
+```
+2. generate the icons:
+
+```bash
+dart run icons_launcher:create
+```
+
+untrack generated files:
+
+```bash
+# git rm --cached android/app/src/main/ic_launcher-playstore.png
+git rm --cached android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+git rm --cached android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+git rm --cached android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+git rm --cached android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+git rm --cached android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+```
+
+
 ### 2025-04-04 16:56:47
 
 :sparkles: image [preview](https://pub.dev/packages/photo_view) & share
