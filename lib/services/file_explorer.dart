@@ -71,6 +71,7 @@ class FileExplorerService extends GetxService {
 
   ExplorableNode get contextFolder => fileTreeController.contextFolder;
   String sysPath(String path) => fileTreeController.sysPath(path);
+  String wkPath(String path) => fileTreeController.wkPath(path);
 
   Future<void> createFolder(String relativePath) 
   => fileTreeController.createDir(sysPath(relativePath));
@@ -88,6 +89,9 @@ class FileExplorerService extends GetxService {
     if (newPath == node.content.path) return;
     return await fileTreeController.rename(node, newPath);
   }
+  
+  Future<void> copyFile(String source, String target)
+  => fileTreeController.copyFile(source, target);
 
   Rx<File?> get activeFile => fileTreeController.activeFile;
   final fileContent = "".obs;

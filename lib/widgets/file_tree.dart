@@ -76,6 +76,10 @@ class FileTreeController extends GetxController {
     }
     return join(contextFolder.content.path, path);
   }
+  String wkPath(String path) {
+    final rel = relative(path, from: rootNode.content.path);
+    return rel;
+  }
 
   ExplorableNode get contextFolder {
     final contextItem = selected ?? rootNode;
@@ -236,9 +240,28 @@ class FileTreeController extends GetxController {
     }
   }
 
+  /// 目标文件存在的处理在外面实现
   Future<void> copyFileOp(String source, String target) async {
-    final targetDir = dirname(target);
-    
+    if (source == target) return;
+    final targetDirPath = dirname(target);
+    if (!await Directory(targetDirPath).exists()) {
+      await Directory(targetDirPath).create(recursive: true);
+    }
+    final sourceFile = File(source);
+    final targetFile = File(target);
+    if (await targetFile.exists()) return;
+    await sourceFile.copy(target);
+    await createFileOP(target);
+  }
+
+  Future<void> copyFile(String source, String target) async {
+    await copyFileOp(source, target);
+    final node = getNode(target);
+    if (node != null) {
+      expandToRoot(node);
+      selected = node;
+    }
+    update();
   }
 }
 

@@ -65,16 +65,15 @@ class ReceiveService extends GetxService {
 
   Future<void> receiveFile(SharedMediaFile file) async {
     final sourcePath = file.path;
-    final name = basename(sourcePath);
-    final targetPath = "${workspace.rootDir.value}/raw/$name";
-    final targetDir = dirname(targetPath);
-    final dir = Directory(targetDir);
-    if (!await dir.exists()) {
-      await dir.create(recursive: true);
+    final name = basenameWithoutExtension(sourcePath);
+    final ext = extension(sourcePath);
+    var targetPath = workspace.sysPath("/raw/$name$ext");
+    if (await File(targetPath).exists()) {
+      targetPath = workspace.sysPath("/raw/$name-copy$ext");
     }
-    await File(sourcePath).copy(targetPath);
+    await workspace.copyFile(sourcePath, targetPath);
 
-    Get.snackbar("Success", "stored to /raw/$name");
+    Get.snackbar("Success", "stored to ${workspace.wkPath(targetPath)}");
   }
 
   Future<void> receiveText(SharedMediaFile file) async {
