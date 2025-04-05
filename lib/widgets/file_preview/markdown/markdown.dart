@@ -33,17 +33,7 @@ class MarkdownPreview extends StatelessWidget {
         'latex': LatexElementBuilderFixed(),
         HighlightBuilder.tag: HighlightBuilder(),
       },
-      imageBuilder: (uri, title, alt) {
-        if (uri.scheme == 'http' || uri.scheme == 'https') {
-          return ImageView.network(uri.toString());
-        } else {
-          var path = uri.toFilePath();
-          if (path[0] != '/') {
-            path = join(dir, path);
-          }
-          return ImageView.file(File(path));
-        }
-      },
+      imageBuilder: imageBuilder,
       extensionSet: md.ExtensionSet(
         [LatexBlockSyntax(), ...md.ExtensionSet.gitHubWeb.blockSyntaxes],
         [LatexInlineSyntax(),  md.EmojiSyntax(), ...md.ExtensionSet.gitHubWeb.inlineSyntaxes],
@@ -58,4 +48,17 @@ class MarkdownPreview extends StatelessWidget {
         ),
     );
   }
+
+  Widget imageBuilder(Uri uri, String? title, String? alt) {
+    if (uri.scheme == 'http' || uri.scheme == 'https') {
+      return ImageView.network(uri.toString());
+    } else {
+      var path = uri.toFilePath();
+      if (path[0] != '/') {
+        path = join(dir, path);
+      }
+      return ImageView.file(File(path));
+    }
+  }
 }
+

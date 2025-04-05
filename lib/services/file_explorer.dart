@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'dart:io';
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 
 import '../widgets/file_tree.dart';
 
@@ -90,12 +89,12 @@ class FileExplorerService extends GetxService {
     return await fileTreeController.rename(node, newPath);
   }
 
-  final activeFile = Rx<File?>(null);
+  Rx<File?> get activeFile => fileTreeController.activeFile;
   final fileContent = "".obs;
   var fileType = FilePreviewType.unknown;
   final fileLoading = false.obs;
   Future<void> goToPreviewFile(File file) async {
-    activeFile.value = file;
+    fileTreeController.selectFile(file); // guard 程序调用
     fileLoading.value = true;
     final (type, content) = await recognizedByExt(file) 
                             ?? await recognizedByContent(file);
@@ -136,6 +135,7 @@ enum FilePreviewType {
   image,
   text,
   markdown,
+  pdf,
   unknown,
 }
 
@@ -147,6 +147,9 @@ Future<(FilePreviewType, String)?> recognizedByExt(File file) async {
 
   final markdownExt = ['md', ];
   if (markdownExt.contains(ext)) return (FilePreviewType.markdown, await file.readAsString());
+
+  final pdfExt = ['pdf', ];
+  if (pdfExt.contains(ext)) return (FilePreviewType.pdf, "");
 
   return null;
 }

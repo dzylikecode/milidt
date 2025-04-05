@@ -74,7 +74,7 @@ class ReceiveService extends GetxService {
     }
     await File(sourcePath).copy(targetPath);
 
-    Get.snackbar("Success", "File copied to raw/$name");
+    Get.snackbar("Success", "stored to /raw/$name");
   }
 
   Future<void> receiveText(SharedMediaFile file) async {

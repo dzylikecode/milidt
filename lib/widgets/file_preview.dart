@@ -6,6 +6,8 @@ import '../services/file_explorer.dart';
 import 'file_preview/markdown/markdown.dart';
 import 'image_view.dart';
 
+import 'package:flutter_pdfview/flutter_pdfview.dart';
+
 class FilePreivew extends StatelessWidget {
   final File file;
   final FilePreviewType type;
@@ -32,6 +34,7 @@ class FilePreivew extends StatelessWidget {
     FilePreviewType.image => image,
     FilePreviewType.text => textFilePreview,
     FilePreviewType.markdown => markdown,
+    FilePreviewType.pdf => pdf,
     FilePreviewType.unknown => unknownedBinaryFile,
   };
 
@@ -80,6 +83,17 @@ class FilePreivew extends StatelessWidget {
           dir: file.parent.path,
         );
 
+  Widget get pdf
+  => PDFView(
+      filePath: file.path,
+      enableSwipe: true,
+      autoSpacing: false,
+      pageSnap: true,
+      pageFling: false,
+      defaultPage: 0,
+      fitPolicy: FitPolicy.BOTH,
+      preventLinkNavigation: false, // if set to true the link is handled in flutter
+    );
 }
 
 class TextFilePreviewContainer  extends StatelessWidget {

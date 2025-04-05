@@ -41,11 +41,20 @@ class FileTreeController extends GetxController {
   }
 
   ExplorableNode? _selectedNode;
+  final activeFile = Rx<File?>(null);
   set selected(ExplorableNode? node) {
     _selectedNode = node;
+    if (node != null && node.content is File) {
+      activeFile.value = node.content as File;
+    } else if (node == null) {
+      activeFile.value = null;
+    }
     update();
   }
   ExplorableNode? get selected => _selectedNode;
+  void selectFile(File file) {
+    selected = getNode(file.path);
+  }
 
   bool isSelected(ExplorableNode node) {
     return _selectedNode == node;
@@ -134,10 +143,12 @@ class FileTreeController extends GetxController {
   }
 
   Future<ExplorableNode> createDirOP(String dirPath) async {
+    final existNode = getNode(dirPath);
+    if (existNode != null) return existNode;
     final parent = dirname(dirPath);
     var parentNode = getNode(parent) ?? await createDirOP(parent);
     final dir = Directory(dirPath);
-    await dir.create(recursive: false);
+    if (!await dir.exists()) await dir.create(recursive: false);
     final newNode = ExplorableNode(dir);
     parentNode.children.add(newNode);
     // 虽然可以二分插入，但是我懒
@@ -153,10 +164,12 @@ class FileTreeController extends GetxController {
   }
 
   Future<void> createFileOP(String path) async {
+    final existNode = getNode(path);
+    if (existNode != null) return;
     final parent = dirname(path);
     var parentNode = getNode(parent) ?? await createDirOP(parent);
     final file = File(path);
-    await file.create(recursive: false);
+    if (!await file.exists()) await file.create(recursive: false);
     final newNode = ExplorableNode(file);
     parentNode.children.add(newNode);
     parentNode.children.sort((a, b) => _orderFS(a.content, b.content));
@@ -221,6 +234,11 @@ class FileTreeController extends GetxController {
     } else {
       await renameFile(node, newPath);
     }
+  }
+
+  Future<void> copyFileOp(String source, String target) async {
+    final targetDir = dirname(target);
+    
   }
 }
 

@@ -81,19 +81,23 @@ class ImageView extends StatelessWidget {
 }
 
 Widget _errorBuilder(BuildContext context, Object error, StackTrace? stackTrace) {
-  return Icon(
-    Icons.broken_image,
-    color: Colors.red,
-    size: 50.0,
+  return Center(
+    child: Icon(
+      Icons.broken_image,
+      color: Colors.red,
+      size: 50.0,
+    ),
   );
 }
 
 Widget _networkLoadingBuilder(BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
   if (loadingProgress == null) return child;
-  return CircularProgressIndicator(
-    value: loadingProgress.expectedTotalBytes != null
-        ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
-        : null,
+  return Center(
+    child: CircularProgressIndicator(
+      value: loadingProgress.expectedTotalBytes != null
+          ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+          : null,
+    )
   );
 }
 

@@ -1,4 +1,4 @@
-# milidt /ˈmɪlaɪt/
+# <img src="assets/app_icon_00.png" alt="app icon" width="24" height="24" style="vertical-align: middle"> milidt /ˈmɪlaɪt/
 
 What is life? It's too profound. Let's break it down with calculus. Life can be seen as a series of integrals:
 
@@ -26,7 +26,13 @@ $$
 
 ## development
 
-build anroid apk：
+1. generate icons:
+
+```bash
+dart run icons_launcher:create
+```
+
+2. build anroid apk：
 
 ```bash
 flutter build apk
@@ -43,6 +49,57 @@ symbols:
 - :page_facing_up: code style
 - :bulb: idea
 - :hammer: fix
+
+### 2025-04-05 14:40:35
+
+:sparkles: pdf preview:
+
+- ~~[pdfrx](https://pub.dev/packages/pdfrx)~~: can't work
+- [syncfusion_flutter_pdfviewer](https://pub.dev/packages/syncfusion_flutter_pdfviewer): licence issue
+- [flutter_pdfview](https://pub.dev/packages/flutter_pdfview)
+
+### 2025/04/05 05:25:05
+
+:hammer: configure other maven sources in `android/settings.gradle.kts`:
+
+```gradle
+pluginManagement {
+    // ...
+    repositories {
+        // start
+        maven { setUrl("https://maven.aliyun.com/repository/central") }  
+        maven { setUrl("https://maven.aliyun.com/repository/jcenter") }  
+        maven { setUrl("https://maven.aliyun.com/repository/google") }  
+        maven { setUrl("https://maven.aliyun.com/repository/gradle-plugin") }  
+        maven { setUrl("https://maven.aliyun.com/repository/public") }  
+        maven { setUrl("https://jitpack.io") }  
+        // end
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+// start
+dependencyResolutionManagement {  
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)  
+    repositories {   
+        maven { setUrl("https://maven.aliyun.com/repository/central") }  
+        maven { setUrl("https://maven.aliyun.com/repository/jcenter") }  
+        maven { setUrl("https://maven.aliyun.com/repository/google") }  
+        maven { setUrl("https://maven.aliyun.com/repository/gradle-plugin") }  
+        maven { setUrl("https://maven.aliyun.com/repository/public") }  
+        maven { setUrl("https://jitpack.io") }  
+        google()  
+        mavenCentral()  
+    }  
+}
+// end
+
+```
+
+but then I need comment out them? Just for downloading some jars?
+
 
 ### 2025/04/05 00:27:45
 
