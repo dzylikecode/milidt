@@ -69,12 +69,13 @@ class FileTreeController extends GetxController {
   }
   ExplorableNode get rootNode => _rootNode;
   bool outOfRoot(String path) => !_isSubPath(rootNode.content.path, path);
-  String sysPath(String path) {
+  String sysPath(String path, [String? context]) {
     if (path[0] == '/') {
       final rel = path.substring(1);
       return join(rootNode.content.path, rel);
     }
-    return join(contextFolder.content.path, path);
+    final contextPath = context ?? contextFolder.content.path;
+    return join(contextPath, path);
   }
   String wkPath(String path) {
     final rel = relative(path, from: rootNode.content.path);

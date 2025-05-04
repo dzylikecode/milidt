@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:milidt/widgets/file_search.dart';
 import 'package:path/path.dart';
 
 import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
@@ -146,7 +147,8 @@ class FileExplorer extends StatelessWidget {
     _BottomSheet(
       node: node, 
       onDelete: onDelete, 
-      onRename: onRename
+      onRename: onRename,
+      onMove: onMove,
     ),
     backgroundColor: Colors.white,
     shape: const RoundedRectangleBorder(
@@ -183,6 +185,13 @@ class FileExplorer extends StatelessWidget {
       initValue: basename(node.content.path),
     );
   }
+
+  void onMove(ExplorableNode node) {
+    moveFSDialog(
+      title: 'Move', 
+      onMove: () => (),
+    );
+  }
 }
 
 
@@ -191,11 +200,13 @@ typedef _BottomSheetCallback = void Function(ExplorableNode node);
 class _BottomSheet extends StatelessWidget {
   final _BottomSheetCallback onDelete;
   final _BottomSheetCallback onRename;
+  final _BottomSheetCallback onMove;
   final ExplorableNode node;
   const _BottomSheet({
     required this.node,
     required this.onDelete,
     required this.onRename,
+    required this.onMove,
   });
 
   @override
@@ -204,6 +215,7 @@ class _BottomSheet extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         rename,
+        move,
         delete,
       ],
     );
@@ -214,6 +226,9 @@ class _BottomSheet extends StatelessWidget {
   
   Widget get rename
   => button("Rename", onRename);
+
+  Widget get move
+  => button("Move", onMove);
   
   Widget button(String name, _BottomSheetCallback callback)
   => ListTile(
@@ -298,5 +313,15 @@ void deleteFSDialog({
         child: const Text("Cancel"),
       ),
     ],
+  );
+}
+
+
+void moveFSDialog({
+  required String title,
+  required void Function() onMove,
+}) {
+  Get.dialog(
+    FileSearch()
   );
 }

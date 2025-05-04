@@ -51,6 +51,7 @@ dependencies:
   dio: ^5.8.0+1
   photo_view: ^0.15.0
   flutter_pdfview: ^1.4.0
+  searchable_listview: ^2.16.0
 
 
 dependency_overrides:

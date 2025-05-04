@@ -83,12 +83,7 @@ class MdEditorPageController extends GetxController {
       final fileName = basename(image.path);
       final markdownDirPath = dirname(file.path);
       final imagePath = "$markdownDirPath/images/$fileName";
-      // images folder 不存在得自己创建
-      final imagesDir = Directory("$markdownDirPath/images");
-      if (!await imagesDir.exists()) {
-        await imagesDir.create();
-      }
-      await File(image.path).copy(imagePath);
+      await FileExplorerService.to.copyFile(image.path, imagePath);
       final relativePath = 'images/$fileName';
       final imageMarkdown = "![image]($relativePath)";
       
